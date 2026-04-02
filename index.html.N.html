@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N.I.B. Décap'sol — Nettoyage Professionnel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --ink: #0e0e0e;
+    --accent: #1a5cff;
+    --accent2: #00c88a;
+    --muted: #7a7a7a;
+    --card: #ffffff;
+    --line: rgba(14,14,14,0.10);
+    --radius: 2px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.25s, height 0.25s, background 0.25s;
+    mix-blend-mode: multiply;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease, width 0.25s, height 0.25s, opacity 0.25s;
+    opacity: 0.5;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(245,242,236,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    transition: padding 0.3s;
+  }
+  .logo {
+    text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo img { height: 52px; width: auto; display: block; }
+  .logo-dot { display: none; }
+  nav { display: flex; align-items: center; gap: 36px; }
+  nav a {
+    font-size: 0.88rem; font-weight: 500; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--muted); text-decoration: none;
+    position: relative; transition: color 0.2s;
+  }
+  nav a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 1.5px;
+    background: var(--accent); transition: width 0.3s ease;
+  }
+  nav a:hover { color: var(--ink); }
+  nav a:hover::after { width: 100%; }
+  .btn-cta {
+    background: var(--accent); color: #fff;
+    border: none; padding: 10px 24px; border-radius: var(--radius);
+    font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700;
+    letter-spacing: 0.03em; text-transform: uppercase;
+    cursor: none; text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-cta:hover { background: #0040d4; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    padding: 140px 48px 80px;
+    gap: 60px; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg-shape {
+    position: absolute; right: -120px; top: 50%; transform: translateY(-50%);
+    width: 720px; height: 720px;
+    background: radial-gradient(ellipse at 60% 40%, #d4e4ff 0%, rgba(245,242,236,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--ink); color: #fff;
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 6px 14px; border-radius: 100px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.7s ease both;
+  }
+  .hero-tag-dot { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 800; line-height: 1.02; letter-spacing: -0.04em;
+    color: var(--ink); margin-bottom: 28px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub {
+    font-size: 1.1rem; font-weight: 300; line-height: 1.7;
+    color: #555; max-width: 420px; margin-bottom: 48px;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+  .hero-actions {
+    display: flex; align-items: center; gap: 20px;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+  .btn-primary {
+    background: var(--ink); color: #fff;
+    padding: 16px 36px; border-radius: var(--radius);
+    font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    text-decoration: none; transition: background 0.2s, transform 0.15s;
+    cursor: none;
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+  .btn-ghost {
+    color: var(--ink); font-size: 0.9rem; font-weight: 500;
+    text-decoration: none; display: flex; align-items: center; gap: 8px;
+    cursor: none; transition: gap 0.2s;
+  }
+  .btn-ghost:hover { gap: 14px; }
+  .btn-ghost svg { transition: transform 0.2s; }
+  .btn-ghost:hover svg { transform: translateX(4px); }
+
+  /* Hero right – visual */
+  .hero-visual {
+    position: relative;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .hero-card-main {
+    background: var(--card); border-radius: 16px;
+    padding: 40px 36px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.08);
+    position: relative; z-index: 1;
+  }
+  .hero-card-main h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700;
+    margin-bottom: 24px; letter-spacing: -0.02em;
+  }
+  .service-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--line);
+  }
+  .service-row:last-child { border-bottom: none; }
+  .service-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .service-icon.blue { background: #e8eeff; }
+  .service-icon.green { background: #d6f7ed; }
+  .service-icon.yellow { background: #fff5d6; }
+  .service-row span { font-size: 0.9rem; font-weight: 500; }
+
+  .hero-badge {
+    position: absolute; bottom: -24px; left: -24px;
+    background: var(--accent); color: #fff; padding: 20px 24px;
+    border-radius: 14px; font-family: 'Syne', sans-serif;
+    box-shadow: 0 8px 32px rgba(26,92,255,0.35);
+  }
+  .hero-badge strong { display: block; font-size: 1.8rem; font-weight: 800; }
+  .hero-badge span { font-size: 0.75rem; opacity: 0.85; letter-spacing: 0.03em; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--ink); color: #fff;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    padding: 0 48px;
+  }
+  .stat-item {
+    padding: 40px 24px; border-right: 1px solid rgba(255,255,255,0.07);
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+  .stat-item.visible { opacity: 1; transform: translateY(0); }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-size: 2.6rem; font-weight: 800;
+    letter-spacing: -0.04em; color: #fff; margin-bottom: 4px;
+  }
+  .stat-num span { color: var(--accent); }
+  .stat-label { font-size: 0.82rem; color: rgba(255,255,255,0.5); letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* ── SECTIONS ── */
+  section { padding: 100px 48px; position: relative; }
+  .section-label {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+  }
+  .section-label::before { content: ''; width: 28px; height: 2px; background: var(--accent); }
+  h2 {
+    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 800; letter-spacing: -0.04em; line-height: 1.1;
+    color: var(--ink); margin-bottom: 20px;
+  }
+  .section-intro {
+    font-size: 1.05rem; font-weight: 300; line-height: 1.7;
+    color: #555; max-width: 520px;
+  }
+
+  /* ── SERVICES ── */
+  #services { background: var(--bg); }
+  .services-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 64px; gap: 40px;
+  }
+  .services-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .service-card {
+    background: var(--card); padding: 48px 36px;
+    position: relative; overflow: hidden;
+    cursor: none;
+    transition: transform 0.3s;
+  }
+  .service-card:hover { transform: translateY(-4px); }
+  .service-card::before {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: var(--accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-num {
+    font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase;
+    margin-bottom: 28px; display: block;
+  }
+  .service-card h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 14px;
+  }
+  .service-card p { font-size: 0.9rem; color: #666; line-height: 1.7; }
+  .service-card-icon {
+    font-size: 2.2rem; margin-bottom: 24px; display: block;
+  }
+
+  /* ── ABOUT ── */
+  #about { background: #fff; }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .about-visual {
+    position: relative;
+    height: 480px;
+  }
+  .about-block {
+    background: var(--bg); border-radius: 16px;
+    position: absolute;
+  }
+  .about-block-1 {
+    left: 0; top: 0; right: 80px; bottom: 80px;
+    background: linear-gradient(135deg, #1a5cff 0%, #0040d4 100%);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .about-block-1 .big-letter {
+    font-family: 'Syne', sans-serif; font-size: 18rem; font-weight: 800;
+    color: rgba(255,255,255,0.07); line-height: 1; user-select: none;
+    letter-spacing: -0.1em;
+  }
+  .about-block-1 .about-text-overlay {
+    position: absolute; bottom: 36px; left: 36px; right: 36px; color: #fff;
+  }
+  .about-block-1 .about-text-overlay p {
+    font-size: 1.4rem; font-family: 'Syne', sans-serif; font-weight: 700;
+    line-height: 1.3; letter-spacing: -0.02em;
+  }
+  .about-block-2 {
+    right: 0; bottom: 0; width: 200px; height: 200px;
+    background: var(--accent2); border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; font-family: 'Syne', sans-serif;
+  }
+  .about-block-2 strong { font-size: 3rem; font-weight: 800; letter-spacing: -0.05em; }
+  .about-block-2 span { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; text-align: center; padding: 0 12px; opacity: 0.9; }
+  .about-checklist { margin-top: 36px; display: flex; flex-direction: column; gap: 14px; }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 20px; background: var(--bg); border-radius: 10px;
+  }
+  .check-icon {
+    width: 24px; height: 24px; background: var(--accent); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: #fff; font-size: 0.75rem; font-weight: 700;
+  }
+  .check-item p { font-size: 0.9rem; color: #444; line-height: 1.5; }
+  .check-item p strong { color: var(--ink); font-weight: 600; display: block; margin-bottom: 2px; }
+
+  /* ── HORAIRES ── */
+  #horaires { background: var(--bg); }
+  .horaires-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 80px; align-items: start; }
+  .hours-table { margin-top: 40px; }
+  .day-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+    opacity: 0; transform: translateX(-16px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .day-row.visible { opacity: 1; transform: translateX(0); }
+  .day-name { font-weight: 500; font-size: 0.95rem; }
+  .day-hours { font-size: 0.88rem; color: #555; }
+  .day-closed { color: var(--muted); font-style: italic; font-size: 0.88rem; }
+  .day-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); margin-right: 10px; flex-shrink: 0; }
+  .day-dot.closed { background: #ddd; }
+
+  .contact-card {
+    background: var(--card); border-radius: 16px; padding: 44px 40px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+    position: sticky; top: 110px;
+  }
+  .contact-card h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
+    letter-spacing: -0.03em; margin-bottom: 32px;
+  }
+  .contact-detail {
+    display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;
+  }
+  .contact-icon {
+    width: 44px; height: 44px; background: #e8eeff; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .contact-detail h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+  .contact-detail p { font-size: 0.95rem; font-weight: 500; color: var(--ink); }
+  .contact-btn {
+    display: block; width: 100%; text-align: center;
+    background: var(--accent); color: #fff; padding: 16px;
+    border-radius: 10px; font-family: 'Syne', sans-serif;
+    font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; text-decoration: none; margin-top: 36px;
+    transition: background 0.2s, transform 0.15s; cursor: none;
+  }
+  .contact-btn:hover { background: #0040d4; transform: translateY(-2px); }
+
+  /* ── MAP SECTION ── */
+  #localisation { background: var(--ink); color: #fff; padding: 100px 48px; }
+  #localisation .section-label { color: var(--accent2); }
+  #localisation .section-label::before { background: var(--accent2); }
+  #localisation h2 { color: #fff; }
+  #localisation .section-intro { color: rgba(255,255,255,0.55); }
+  .map-wrapper {
+    margin-top: 60px; border-radius: 16px; overflow: hidden;
+    height: 380px; position: relative;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+  }
+  .map-wrapper iframe { width: 100%; height: 100%; border: none; filter: grayscale(20%) invert(10%); }
+  .map-overlay-info {
+    position: absolute; left: 32px; bottom: 32px;
+    background: rgba(255,255,255,0.12); backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 14px;
+    padding: 20px 24px; color: #fff;
+  }
+  .map-overlay-info strong { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; display: block; margin-bottom: 4px; }
+  .map-overlay-info span { font-size: 0.85rem; opacity: 0.7; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #0a0a0a; color: rgba(255,255,255,0.4);
+    padding: 48px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem;
+    color: #fff; letter-spacing: -0.03em;
+  }
+  footer p { font-size: 0.8rem; }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a { font-size: 0.8rem; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; cursor: none; }
+  .footer-links a:hover { color: #fff; }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    header { padding: 16px 24px; }
+    nav { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; }
+    .hero-visual { display: none; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    section { padding: 70px 24px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .about-grid, .horaires-grid { grid-template-columns: 1fr; }
+    .about-visual { height: 260px; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+    .footer-links { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- HEADER -->
+<header>
+  <a href="#" class="logo">
+    <img src="data:image/jpeg;base64,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" alt="NIB Décap'sol">
+  </a>
+  <nav>
+    <a href="#services">Services</a>
+    <a href="#about">À propos</a>
+    <a href="#horaires">Horaires</a>
+    <a href="#localisation">Contact</a>
+  </nav>
+  <a href="#horaires" class="btn-cta">Nous contacter</a>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg-shape"></div>
+  <div class="hero-content">
+    <div class="hero-tag"><span class="hero-tag-dot"></span> Trelaze, Maine-et-Loire</div>
+    <h1>L'excellence<br>du <em>nettoyage</em><br>professionnel.</h1>
+    <p class="hero-sub">N.I.B. Décap'sol — Nettoyage Immeubles et Bureaux. Des prestations sur‑mesure pour espaces professionnels, copropriétés et collectivités.</p>
+    <div class="hero-actions">
+      <a href="#services" class="btn-primary">Découvrir nos services</a>
+      <a href="#localisation" class="btn-ghost">
+        Nous trouver
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card-main">
+      <h3>Nos domaines d'intervention</h3>
+      <div class="service-row">
+        <div class="service-icon blue">🏢</div>
+        <span>Nettoyage de bureaux</span>
+      </div>
+      <div class="service-row">
+        <div class="service-icon green">🏠</div>
+        <span>Entretien d'immeubles</span>
+      </div>
+      <div class="service-row">
+        <div class="service-icon yellow">✨</div>
+        <span>Remise en état & décapage</span>
+      </div>
+      <div class="service-row">
+        <div class="service-icon blue">🌿</div>
+        <span>Produits éco-responsables</span>
+      </div>
+    </div>
+    <div class="hero-badge">
+      <strong>100%</strong>
+      <span>Satisfaction client</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num">+<span>500</span></div>
+    <div class="stat-label">Clients satisfaits</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num"><span>6</span> j/7</div>
+    <div class="stat-label">Disponibles pour vous</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num"><span>100</span>%</div>
+    <div class="stat-label">Interventions garanties</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num"><span>∞</span></div>
+    <div class="stat-label">Engagement qualité</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header reveal">
+    <div>
+      <div class="section-label">Nos services</div>
+      <h2>Une expertise<br>complète pour<br>chaque besoin.</h2>
+    </div>
+    <p class="section-intro">De l'entretien quotidien à la remise en état approfondie, N.I.B. Décap'sol propose une gamme complète de prestations adaptées à vos exigences.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <span class="service-num">01</span>
+      <span class="service-card-icon">🏢</span>
+      <h3>Bureaux & Espaces professionnels</h3>
+      <p>Nettoyage régulier ou ponctuel de vos bureaux, open-spaces, sanitaires et espaces communs. Discrétion et efficacité garanties.</p>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-num">02</span>
+      <span class="service-card-icon">🏬</span>
+      <h3>Immeubles & Copropriétés</h3>
+      <p>Entretien des parties communes, halls d'entrée, escaliers, parkings et extérieurs. Contrats sur mesure pour syndics et gestionnaires.</p>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-num">03</span>
+      <span class="service-card-icon">🔧</span>
+      <h3>Décapage & Remise en état</h3>
+      <p>Décapage sols, désencrassage en profondeur, traitement et protection de vos surfaces. Remise à neuf après travaux ou événements.</p>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-num">04</span>
+      <span class="service-card-icon">🪟</span>
+      <h3>Vitrerie & Façades</h3>
+      <p>Lavage de vitres, nettoyage de façades et bardages. Résultats impeccables pour une image professionnelle irréprochable.</p>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-num">05</span>
+      <span class="service-card-icon">🌿</span>
+      <h3>Nettoyage éco-responsable</h3>
+      <p>Utilisation de produits respectueux de l'environnement et des occupants. Certification et démarche qualité en continu.</p>
+    </div>
+    <div class="service-card reveal">
+      <span class="service-num">06</span>
+      <span class="service-card-icon">📋</span>
+      <h3>Contrats d'entretien</h3>
+      <p>Devis gratuit et personnalisé, planning d'intervention flexible, équipe dédiée et suivi qualité régulier pour chaque contrat.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-visual reveal">
+      <div class="about-block-1">
+        <div class="big-letter">NIB</div>
+        <div class="about-text-overlay">
+          <p>Nettoyage<br>Immeubles<br>& Bureaux</p>
+        </div>
+      </div>
+      <div class="about-block-2">
+        <strong>Pro</strong>
+        <span>Certifié &amp; Assuré</span>
+      </div>
+    </div>
+    <div class="about-content reveal">
+      <div class="section-label">À propos</div>
+      <h2>Une référence du nettoyage à Trelaze.</h2>
+      <p class="section-intro">Implantée au cœur du Maine-et-Loire, N.I.B. Décap'sol s'est imposée comme un acteur majeur du nettoyage professionnel grâce à son savoir-faire et son engagement constant.</p>
+      <div class="about-checklist">
+        <div class="check-item">
+          <div class="check-icon">✓</div>
+          <p><strong>Personnel formé & encadré</strong>Nos équipes sont régulièrement formées aux techniques et protocoles les plus récents.</p>
+        </div>
+        <div class="check-item">
+          <div class="check-icon">✓</div>
+          <p><strong>Matériel professionnel</strong>Équipements haute performance pour des résultats durables sur tous types de surfaces.</p>
+        </div>
+        <div class="check-item">
+          <div class="check-icon">✓</div>
+          <p><strong>Réactivité & flexibilité</strong>Intervention rapide, planning adapté à vos contraintes, devis sous 48h.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HORAIRES & CONTACT -->
+<section id="horaires">
+  <div class="horaires-grid">
+    <div>
+      <div class="section-label reveal">Horaires d'ouverture</div>
+      <h2 class="reveal">Toujours là quand<br>vous en avez besoin.</h2>
+      <div class="hours-table">
+        <div class="day-row"><div class="day-dot"></div><span class="day-name">Lundi</span><span class="day-hours">09h00–12h00 · 14h00–18h00</span></div>
+        <div class="day-row"><div class="day-dot"></div><span class="day-name">Mardi</span><span class="day-hours">09h00–12h00 · 14h00–18h00</span></div>
+        <div class="day-row"><div class="day-dot"></div><span class="day-name">Mercredi</span><span class="day-hours">09h00–12h00 · 14h00–18h00</span></div>
+        <div class="day-row"><div class="day-dot"></div><span class="day-name">Jeudi</span><span class="day-hours">09h00–12h00 · 14h00–18h00</span></div>
+        <div class="day-row"><div class="day-dot"></div><span class="day-name">Vendredi</span><span class="day-hours">09h00–12h00 · 14h00–18h00</span></div>
+        <div class="day-row"><div class="day-dot"></div><span class="day-name">Samedi</span><span class="day-hours">09h00–12h00 · 14h00–18h00</span></div>
+        <div class="day-row"><div class="day-dot closed"></div><span class="day-name">Dimanche</span><span class="day-closed">Fermé</span></div>
+      </div>
+    </div>
+    <div class="contact-card reveal">
+      <h3>Contactez‑nous</h3>
+      <div class="contact-detail">
+        <div class="contact-icon">📍</div>
+        <div>
+          <h4>Adresse</h4>
+          <p>156 rue Jean Jaurès<br>49800 Trelaze</p>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-icon">🕐</div>
+        <div>
+          <h4>Ouverture</h4>
+          <p>Lun – Sam : 9h–12h & 14h–18h</p>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-icon">✉️</div>
+        <div>
+          <h4>Devis gratuit</h4>
+          <p>Réponse sous 48h</p>
+        </div>
+      </div>
+      <a href="https://maps.google.com/?q=156+rue+Jean+Jaures+49800+Trelaze" target="_blank" class="contact-btn">📍 Nous trouver sur Google Maps</a>
+    </div>
+  </div>
+</section>
+
+<!-- LOCALISATION -->
+<section id="localisation">
+  <div class="section-label">Localisation</div>
+  <h2>Trelaze, au cœur du<br>Maine-et-Loire.</h2>
+  <p class="section-intro">156 rue Jean Jaurès, 49800 Trelaze — facilement accessible depuis Angers et toute l'agglomération.</p>
+  <div class="map-wrapper reveal">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2699.3!2d-0.453!3d47.446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDfCsDI2JzQ2LjAiTiAwwrAyNycxMC44Ilc!5e0!3m2!1sfr!2sfr!4v1680000000000!5m2!1sfr!2sfr&q=156+rue+Jean+Jaures+49800+Trelaze+France"
+      allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+    <div class="map-overlay-info">
+      <strong>N.I.B. Décap'sol</strong>
+      <span>156 rue Jean Jaurès — 49800 Trelaze</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">NIB · Décap'sol</div>
+  <p>© 2025 N.I.B. Décap'sol — Nettoyage Immeubles et Bureaux. Trelaze, Maine-et-Loire.</p>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#about">À propos</a>
+    <a href="#horaires">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // ── Custom cursor ──
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx+'px'; cursor.style.top = my+'px'; });
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button,.service-card').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.width='18px'; cursor.style.height='18px'; ring.style.width='56px'; ring.style.height='56px'; ring.style.opacity='0.25'; });
+    el.addEventListener('mouseleave', () => { cursor.style.width='12px'; cursor.style.height='12px'; ring.style.width='36px'; ring.style.height='36px'; ring.style.opacity='0.5'; });
+  });
+
+  // ── Scroll reveal ──
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal, .stat-item, .day-row').forEach(el => io.observe(el));
+
+  // Stagger day rows
+  document.querySelectorAll('.day-row').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.07) + 's';
+  });
+</script>
+</body>
+</html>
